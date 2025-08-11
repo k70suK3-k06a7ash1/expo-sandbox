@@ -18,19 +18,19 @@ export class TaskService {
       updatedAt: now,
     };
     
-    TaskService.getStoreInstance().setRow('tasks', id, task as Record<string, string | number | boolean>);
+    TaskService.getStoreInstance().setRow('tasks', id, task as unknown as Record<string, string | number | boolean>);
     return task;
   }
   
   // READ
   static getAllTasks(): Task[] {
     const tasksTable = TaskService.getStoreInstance().getTable('tasks');
-    return Object.values(tasksTable) as Task[];
+    return Object.values(tasksTable) as unknown as Task[];
   }
   
   static getTaskById(id: string): Task | undefined {
     const task = TaskService.getStoreInstance().getRow('tasks', id);
-    return task ? (task as Task) : undefined;
+    return task && Object.keys(task).length > 0 ? (task as unknown as Task) : undefined;
   }
   
   static getTasksByStatus(completed: boolean): Task[] {
@@ -60,7 +60,7 @@ export class TaskService {
       updatedAt: Date.now(),
     };
     
-    TaskService.getStoreInstance().setRow('tasks', id, updatedTask as Record<string, string | number | boolean>);
+    TaskService.getStoreInstance().setRow('tasks', id, updatedTask as unknown as Record<string, string | number | boolean>);
     return updatedTask;
   }
   

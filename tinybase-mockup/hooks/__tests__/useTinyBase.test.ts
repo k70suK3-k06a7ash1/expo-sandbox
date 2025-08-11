@@ -2,8 +2,8 @@ import { describe, it, expect, beforeEach, vi } from 'vitest';
 
 // Mock the dependencies
 const mockStore = {
-  addTableListener: vi.fn(() => 'listener-id'),
-  addRowListener: vi.fn(() => 'listener-id'),
+  addTableListener: vi.fn((_tableId: string, _listener: () => void) => 'listener-id'),
+  addRowListener: vi.fn((_tableId: string, _rowId: string, _listener: () => void) => 'listener-id'),
   delListener: vi.fn(),
 };
 
@@ -34,6 +34,7 @@ const mockUserService = {
       id: '1',
       name: 'John Doe',
       email: 'john@example.com',
+      avatar: 'https://example.com/avatar.jpg',
       createdAt: Date.now(),
     },
   ]),
@@ -116,7 +117,7 @@ describe('TinyBase Services Integration with React Native Testing Library', () =
 
     it('should call methods with correct parameters', () => {
       // Test create
-      const userData = { name: 'John Doe', email: 'john@example.com' };
+      const userData = { name: 'John Doe', email: 'john@example.com', avatar: 'https://example.com/avatar.jpg' };
       mockUserService.createUser(userData);
       expect(mockUserService.createUser).toHaveBeenCalledWith(userData);
 
@@ -225,7 +226,7 @@ describe('TinyBase Services Integration with React Native Testing Library', () =
   describe('Data Flow Patterns', () => {
     it('should support typical CRUD workflows', () => {
       // Create workflow
-      const newTask = { id: 'task1', title: 'New Task', completed: false, createdAt: Date.now(), updatedAt: Date.now() };
+      const newTask = { id: 'task1', title: 'New Task', description: 'Test Description', completed: false, createdAt: Date.now(), updatedAt: Date.now() };
       mockTaskService.createTask.mockReturnValue(newTask);
       
       const created = mockTaskService.createTask({ title: 'New Task', description: '', completed: false });
@@ -268,9 +269,10 @@ describe('TinyBase Services Integration with React Native Testing Library', () =
       mockUserService.getAllUsers.mockReturnValue([
         {
           id: '1',
-          name: 'John Doe',
-          email: 'john@example.com',
-          createdAt: Date.now(),
+      name: 'John Doe',
+      email: 'john@example.com',
+      avatar: 'https://example.com/avatar.jpg',
+      createdAt: Date.now(),
         },
       ]);
 

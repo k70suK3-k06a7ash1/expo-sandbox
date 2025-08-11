@@ -95,7 +95,7 @@ describe('TaskService', () => {
     });
 
     it('should return undefined when task not found', () => {
-      vi.mocked(mockStore.getRow).mockReturnValue(undefined);
+      vi.mocked(mockStore.getRow).mockReturnValue({});
 
       const result = TaskService.getTaskById('nonexistent');
 
@@ -179,7 +179,7 @@ describe('TaskService', () => {
     });
 
     it('should return null if task does not exist', () => {
-      vi.mocked(mockStore.getRow).mockReturnValue(undefined);
+      vi.mocked(mockStore.getRow).mockReturnValue({});
 
       const result = TaskService.updateTask('nonexistent', { title: 'New Title' });
 
@@ -208,7 +208,7 @@ describe('TaskService', () => {
     });
 
     it('should return null if task does not exist', () => {
-      vi.mocked(mockStore.getRow).mockReturnValue(undefined);
+      vi.mocked(mockStore.getRow).mockReturnValue({});
 
       const result = TaskService.toggleTaskCompletion('nonexistent');
 
@@ -228,7 +228,7 @@ describe('TaskService', () => {
     });
 
     it('should return false if task does not exist', () => {
-      vi.mocked(mockStore.getRow).mockReturnValue(undefined);
+      vi.mocked(mockStore.getRow).mockReturnValue({});
 
       const result = TaskService.deleteTask('nonexistent');
 
