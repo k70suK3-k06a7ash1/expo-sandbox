@@ -1,0 +1,85 @@
+name: Status Check
+
+on:
+  workflow_run:
+    workflows: ["CI", "Test Coverage"]
+    types:
+      - completed
+
+jobs:
+  status-check:
+    name: Overall Status Check
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Check CI Workflow Status
+        if: ${{ github.event.workflow_run.conclusion == 'success' }}
+        run: |
+          echo "✅ CI Pipeline Status: SUCCESS"
+          echo "Workflow: ${{ github.event.workflow_run.name }}"
+          echo "Branch: ${{ github.event.workflow_run.head_branch }}"
+          echo "Commit: ${{ github.event.workflow_run.head_sha }}"
+          echo "Run ID: ${{ github.event.workflow_run.id }}"
+
+      - name: Check CI Workflow Failure
+        if: ${{ github.event.workflow_run.conclusion == 'failure' }}
+        run: |
+          echo "❌ CI Pipeline Status: FAILURE"
+          echo "Workflow: ${{ github.event.workflow_run.name }}"
+          echo "Branch: ${{ github.event.workflow_run.head_branch }}"
+          echo "Commit: ${{ github.event.workflow_run.head_sha }}"
+          echo "Run ID: ${{ github.event.workflow_run.id }}"
+          echo "Please check the workflow logs for details."
+          exit 1
+
+      - name: Update Status
+        run: |
+          echo "🔄 Updating project status..."
+          echo "Last CI Run: $(date)"
+          echo "Status: ${{ github.event.workflow_run.conclusion }}"
+          
+  validate-setup:
+    name: Validate CI Setup
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Validate Workflow Files
+        run: |
+          echo "🔍 Validating CI configuration..."
+          
+          # Check required files exist
+          echo "Checking required files..."
+          test -f .github/workflows/ci.yml && echo "✅ ci.yml exists"
+          test -f .github/workflows/test-coverage.yml && echo "✅ test-coverage.yml exists"
+          test -f vitest.config.ts && echo "✅ vitest.config.ts exists"
+          test -f package.json && echo "✅ package.json exists"
+          
+          # Validate package.json test scripts
+          echo "Checking test scripts..."
+          grep -q "test.*vitest" package.json && echo "✅ Test script configured"
+          grep -q "test:run.*vitest run" package.json && echo "✅ Test run script configured"
+          grep -q "test:coverage.*coverage" package.json && echo "✅ Coverage script configured"
+          
+          echo "✅ CI setup validation complete"
+
+      - name: Test Configuration
+        run: |
+          echo "🧪 Testing configuration..."
+          
+          # Check if test files exist
+          find . -name "*.test.ts" -o -name "*.test.js" | head -5 | while read file; do
+            echo "✅ Found test file: $file"
+          done
+          
+          # Count test files
+          TEST_COUNT=$(find . -name "*.test.ts" -o -name "*.test.js" | wc -l)
+          echo "📊 Total test files: $TEST_COUNT"
+          
+          if [ $TEST_COUNT -gt 0 ]; then
+            echo "✅ Test files present"
+          else
+            echo "⚠️  No test files found"
+          fi

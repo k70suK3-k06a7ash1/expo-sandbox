@@ -1,0 +1,152 @@
+name: CI
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+
+jobs:
+  test:
+    name: Test Suite
+    runs-on: ubuntu-latest
+    
+    strategy:
+      matrix:
+        node-version: [18.x, 20.x]
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci --legacy-peer-deps
+
+      - name: Run linter
+        run: npm run lint
+
+      - name: Run tests
+        run: npm run test:run
+
+      - name: Generate test coverage
+        run: npm run test:coverage
+        continue-on-error: true
+
+      - name: Upload coverage reports to Codecov
+        uses: codecov/codecov-action@v4
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          files: ./coverage/lcov.info
+          fail_ci_if_error: false
+        continue-on-error: true
+
+  build:
+    name: Build Check
+    runs-on: ubuntu-latest
+    needs: test
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20.x'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci --legacy-peer-deps
+
+      - name: Setup Expo CLI
+        run: npm install -g @expo/cli
+
+      - name: Expo Doctor
+        run: expo doctor
+
+      - name: Check TypeScript
+        run: npx tsc --noEmit
+
+      - name: Build for web (production)
+        run: expo export -p web
+        env:
+          EXPO_NO_TELEMETRY: 1
+
+  security:
+    name: Security Audit
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20.x'
+          cache: 'npm'
+
+      - name: Run npm audit
+        run: npm audit --audit-level=moderate
+        continue-on-error: true
+
+      - name: Run npm audit fix
+        run: npm audit fix --dry-run
+
+  compatibility:
+    name: Expo Compatibility
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20.x'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci --legacy-peer-deps
+
+      - name: Setup Expo CLI
+        run: npm install -g @expo/cli
+
+      - name: Check Expo SDK compatibility
+        run: expo install --check
+
+      - name: Validate app.json
+        run: expo config --type=public
+
+  notify:
+    name: Notify Results
+    runs-on: ubuntu-latest
+    needs: [test, build, security, compatibility]
+    if: always()
+    
+    steps:
+      - name: Notify Success
+        if: ${{ needs.test.result == 'success' && needs.build.result == 'success' }}
+        run: |
+          echo "✅ All CI checks passed!"
+          echo "- Tests: ${{ needs.test.result }}"
+          echo "- Build: ${{ needs.build.result }}"
+          echo "- Security: ${{ needs.security.result }}"
+          echo "- Compatibility: ${{ needs.compatibility.result }}"
+
+      - name: Notify Failure
+        if: ${{ needs.test.result == 'failure' || needs.build.result == 'failure' }}
+        run: |
+          echo "❌ CI checks failed!"
+          echo "- Tests: ${{ needs.test.result }}"
+          echo "- Build: ${{ needs.build.result }}"
+          echo "- Security: ${{ needs.security.result }}"
+          echo "- Compatibility: ${{ needs.compatibility.result }}"
+          exit 1

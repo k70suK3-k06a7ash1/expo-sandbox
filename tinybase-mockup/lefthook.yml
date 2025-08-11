@@ -1,0 +1,11 @@
+pre-commit:
+  commands:
+    lint:
+      run: npm run lint
+      fail_text: "Linting failed. Please fix the issues and try again."
+    test:
+      run: npm run test:run
+      fail_text: "Tests failed. Please fix the failing tests and try again."
+    type-check:
+      run: npx tsc --noEmit
+      fail_text: "Type check failed. Please fix the type errors and try again."
