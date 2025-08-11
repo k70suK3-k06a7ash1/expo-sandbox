@@ -24,7 +24,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '20.x'
+          node-version: '22.x'
           cache: 'npm'
           cache-dependency-path: ./tinybase-mockup/package-lock.json
 
@@ -84,13 +84,8 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu-latest, windows-latest, macos-latest]
-        node-version: [18.x, 20.x, 21.x]
-        exclude:
-          # Exclude some combinations to reduce CI load
-          - os: windows-latest
-            node-version: 21.x
-          - os: macos-latest
-            node-version: 18.x
+        node-version: [22.x]
+        # No exclusions needed with single Node version
 
     defaults:
       run:
@@ -133,7 +128,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '20.x'
+          node-version: '22.x'
           cache: 'npm'
           cache-dependency-path: ./tinybase-mockup/package-lock.json
 
@@ -172,7 +167,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '20.x'
+          node-version: '22.x'
           cache: 'npm'
           cache-dependency-path: ./tinybase-mockup/package-lock.json
 
