@@ -82,7 +82,7 @@ jobs:
           npx --yes @expo/cli@latest --version
 
       - name: Expo Doctor
-        run: npx --yes @expo/cli@latest doctor
+        run: npx expo-doctor
 
       - name: Check TypeScript
         run: npx tsc --noEmit
