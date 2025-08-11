@@ -1,8 +1,6 @@
 import { createStore, Store } from 'tinybase';
-import { createExpoSqlitePersister } from 'tinybase/persisters/persister-expo-sqlite';
 import { createLocalPersister } from 'tinybase/persisters/persister-browser';
 import { Platform } from 'react-native';
-import * as SQLite from 'expo-sqlite';
 
 export interface Task {
   id: string;
@@ -23,7 +21,7 @@ export interface User {
 
 // Create the TinyBase store with persistence
 let store: Store;
-let persister: ReturnType<typeof createExpoSqlitePersister | typeof createLocalPersister>;
+let persister: any;
 
 const initializeSampleData = () => {
   store.setTables({
@@ -76,30 +74,44 @@ export const getStore = (): Store => {
   if (!store) {
     store = createStore();
     
-    // Create platform-specific persister
-    persister = Platform.OS === 'web'
-      ? createLocalPersister(store, 'tinybase_data')
-      : createExpoSqlitePersister(store, SQLite.openDatabaseSync('tinybase.db'));
-    
-    // Load persisted data and start auto-save
-    persister.load().then(() => {
-      // Check if we have any data, if not, initialize with sample data
-      const tables = store.getTables();
-      const hasData = Object.keys(tables).length > 0 && 
-                      (Object.keys(tables.tasks || {}).length > 0 || 
-                       Object.keys(tables.users || {}).length > 0);
-      
-      if (!hasData) {
-        initializeSampleData();
+    // Create platform-specific persister using dynamic imports
+    const initializePersister = async () => {
+      if (Platform.OS === 'web') {
+        persister = createLocalPersister(store, 'tinybase_data');
+      } else {
+        // Dynamic import for native platforms to avoid bundling in web
+        const { createExpoSqlitePersister } = await import('tinybase/persisters/persister-expo-sqlite');
+        const SQLite = await import('expo-sqlite');
+        persister = createExpoSqlitePersister(store, SQLite.openDatabaseSync('tinybase.db'));
       }
-      
-      // Start auto-save after loading/initializing data
-      persister.startAutoSave();
-    }).catch((error: Error) => {
-      console.error('Failed to load persisted data:', error);
-      // Initialize with sample data if loading fails
+    
+      // Load persisted data and start auto-save
+      return persister.load().then(() => {
+        // Check if we have any data, if not, initialize with sample data
+        const tables = store.getTables();
+        const hasData = Object.keys(tables).length > 0 && 
+                        (Object.keys(tables.tasks || {}).length > 0 || 
+                         Object.keys(tables.users || {}).length > 0);
+        
+        if (!hasData) {
+          initializeSampleData();
+        }
+        
+        // Start auto-save after loading/initializing data
+        persister.startAutoSave();
+      }).catch((error: Error) => {
+        console.error('Failed to load persisted data:', error);
+        // Initialize with sample data if loading fails
+        initializeSampleData();
+        persister.startAutoSave();
+      });
+    };
+    
+    // Initialize persister asynchronously
+    initializePersister().catch((error) => {
+      console.error('Failed to initialize persister:', error);
+      // Fallback to sample data without persistence
       initializeSampleData();
-      persister.startAutoSave();
     });
   }
   
