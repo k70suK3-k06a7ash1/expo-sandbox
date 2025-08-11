@@ -52,16 +52,16 @@ jobs:
           
           # Check required files exist
           echo "Checking required files..."
-          test -f .github/workflows/ci.yml && echo "✅ ci.yml exists"
-          test -f .github/workflows/test-coverage.yml && echo "✅ test-coverage.yml exists"
-          test -f vitest.config.ts && echo "✅ vitest.config.ts exists"
-          test -f package.json && echo "✅ package.json exists"
+          test -f .github/workflows/tinybase-mockup-ci.yml && echo "✅ tinybase-mockup-ci.yml exists"
+          test -f .github/workflows/tinybase-mockup-test-coverage.yml && echo "✅ tinybase-mockup-test-coverage.yml exists"
+          test -f tinybase-mockup/vitest.config.ts && echo "✅ vitest.config.ts exists"
+          test -f tinybase-mockup/package.json && echo "✅ package.json exists"
           
           # Validate package.json test scripts
           echo "Checking test scripts..."
-          grep -q "test.*vitest" package.json && echo "✅ Test script configured"
-          grep -q "test:run.*vitest run" package.json && echo "✅ Test run script configured"
-          grep -q "test:coverage.*coverage" package.json && echo "✅ Coverage script configured"
+          grep -q "test.*vitest" tinybase-mockup/package.json && echo "✅ Test script configured"
+          grep -q "test:run.*vitest run" tinybase-mockup/package.json && echo "✅ Test run script configured"
+          grep -q "test:coverage.*coverage" tinybase-mockup/package.json && echo "✅ Coverage script configured"
           
           echo "✅ CI setup validation complete"
 
@@ -69,13 +69,13 @@ jobs:
         run: |
           echo "🧪 Testing configuration..."
           
-          # Check if test files exist
-          find . -name "*.test.ts" -o -name "*.test.js" | head -5 | while read file; do
+          # Check if test files exist in tinybase-mockup directory
+          find tinybase-mockup -name "*.test.ts" -o -name "*.test.js" | head -5 | while read file; do
             echo "✅ Found test file: $file"
           done
           
           # Count test files
-          TEST_COUNT=$(find . -name "*.test.ts" -o -name "*.test.js" | wc -l)
+          TEST_COUNT=$(find tinybase-mockup -name "*.test.ts" -o -name "*.test.js" | wc -l)
           echo "📊 Total test files: $TEST_COUNT"
           
           if [ $TEST_COUNT -gt 0 ]; then
