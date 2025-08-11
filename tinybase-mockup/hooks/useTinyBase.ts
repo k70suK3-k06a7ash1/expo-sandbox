@@ -18,7 +18,7 @@ export const useTasks = () => {
       setTasks(TaskService.getAllTasks());
     });
 
-    return () => store.delListener(listenerId);
+    return () => { store.delListener(listenerId); };
   }, []);
 
   return {
@@ -49,7 +49,7 @@ export const useUsers = () => {
       setUsers(UserService.getAllUsers());
     });
 
-    return () => store.delListener(listenerId);
+    return () => { store.delListener(listenerId); };
   }, []);
 
   return {
@@ -77,7 +77,7 @@ export const useTask = (taskId: string) => {
       setTask(TaskService.getTaskById(taskId));
     });
 
-    return () => store.delListener(listenerId);
+    return () => { store.delListener(listenerId); };
   }, [taskId]);
 
   return task;
@@ -96,7 +96,7 @@ export const useUser = (userId: string) => {
       setUser(UserService.getUserById(userId));
     });
 
-    return () => store.delListener(listenerId);
+    return () => { store.delListener(listenerId); };
   }, [userId]);
 
   return user;

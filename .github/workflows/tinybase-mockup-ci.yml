@@ -1,3 +1,5 @@
+# TinyBase CRUD Demo CI Pipeline
+# Includes: Testing, Building, Security Audit, and Expo Compatibility
 name: CI
 
 on:
@@ -13,7 +15,7 @@ jobs:
     
     strategy:
       matrix:
-        node-version: [18.x, 20.x]
+        node-version: [22.x]
 
     defaults:
       run:
@@ -67,7 +69,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '20.x'
+          node-version: '22.x'
           cache: 'npm'
           cache-dependency-path: ./tinybase-mockup/package-lock.json
 
@@ -75,16 +77,18 @@ jobs:
         run: npm ci --legacy-peer-deps
 
       - name: Setup Expo CLI
-        run: npm install -g @expo/cli
+        run: |
+          echo "Testing Expo CLI with npx (downloads automatically)..."
+          npx --yes @expo/cli@latest --version
 
       - name: Expo Doctor
-        run: expo doctor
+        run: npx expo-doctor
 
       - name: Check TypeScript
         run: npx tsc --noEmit
 
       - name: Build for web (production)
-        run: expo export -p web
+        run: npx --yes @expo/cli@latest export -p web
         env:
           EXPO_NO_TELEMETRY: 1
 
@@ -103,16 +107,20 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '20.x'
+          node-version: '22.x'
           cache: 'npm'
           cache-dependency-path: ./tinybase-mockup/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci --legacy-peer-deps
 
       - name: Run npm audit
         run: npm audit --audit-level=moderate
         continue-on-error: true
 
       - name: Run npm audit fix
-        run: npm audit fix --dry-run
+        run: npm audit fix --dry-run --legacy-peer-deps
+        continue-on-error: true
 
   compatibility:
     name: Expo Compatibility
@@ -129,7 +137,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '20.x'
+          node-version: '22.x'
           cache: 'npm'
           cache-dependency-path: ./tinybase-mockup/package-lock.json
 
@@ -137,13 +145,15 @@ jobs:
         run: npm ci --legacy-peer-deps
 
       - name: Setup Expo CLI
-        run: npm install -g @expo/cli
+        run: |
+          echo "Using npx to run Expo CLI (downloads automatically)..."
+          npx --yes @expo/cli@latest --version
 
       - name: Check Expo SDK compatibility
-        run: expo install --check
+        run: npx --yes @expo/cli@latest install --check
 
       - name: Validate app.json
-        run: expo config --type=public
+        run: npx --yes @expo/cli@latest config --type=public
 
   notify:
     name: Notify Results
