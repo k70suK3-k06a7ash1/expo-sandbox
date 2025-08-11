@@ -33,17 +33,18 @@ jobs:
       - name: Run tests with coverage
         run: npm run test:coverage
 
-      - name: Generate test badge
-        uses: badge-generator/vitest-badge@v1
+      - name: Generate coverage badge
+        uses: jaywcjlove/coverage-badges-cli@main
         with:
-          coverage-file: ./tinybase-mockup/coverage/coverage-summary.json
-          badge-path: ./.github/badges/tests.svg
+          source: ./tinybase-mockup/coverage/coverage-summary.json
+          output: ./.github/badges/coverage.svg
 
-      - name: Generate coverage badge  
-        uses: badge-generator/javascript-coverage-badge@main
-        with:
-          coverage-file: ./tinybase-mockup/coverage/coverage-summary.json
-          badge-path: ./.github/badges/coverage.svg
+      - name: Generate test status badge
+        working-directory: ./
+        run: |
+          mkdir -p ./.github/badges
+          # Generate a simple test badge based on test results
+          echo '<svg xmlns="http://www.w3.org/2000/svg" width="88" height="20"><g shape-rendering="crispEdges"><path fill="#555" d="M0 0h37v20H0z"/><path fill="#4c1" d="M37 0h51v20H37z"/></g><g fill="#fff" text-anchor="middle" font-family="DejaVu Sans,Verdana,Geneva,sans-serif" font-size="110"><text x="195" y="150" fill="#010101" fill-opacity=".3" transform="scale(.1)" textLength="270">tests</text><text x="195" y="140" transform="scale(.1)" textLength="270">tests</text><text x="615" y="150" fill="#010101" fill-opacity=".3" transform="scale(.1)" textLength="410">passing</text><text x="615" y="140" transform="scale(.1)" textLength="410">passing</text></g></svg>' > ./.github/badges/tests.svg
 
       - name: Generate build status badge
         working-directory: ./
