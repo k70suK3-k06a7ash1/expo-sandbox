@@ -1,11 +1,11 @@
 {
   "expo": {
-    "name": "local-first-mockup",
-    "slug": "local-first-mockup",
+    "name": "tinybase-mockup",
+    "slug": "tinybase-mockup",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
-    "scheme": "localfirstmockup",
+    "scheme": "tinybasemockup",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "ios": {
