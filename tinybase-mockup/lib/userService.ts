@@ -10,24 +10,26 @@ export class UserService {
     const now = Date.now();
     
     const user: User = {
-      ...userData,
       id,
+      name: userData.name,
+      email: userData.email,
+      avatar: userData.avatar,
       createdAt: now,
     };
     
-    UserService.getStoreInstance().setRow('users', id, user);
+    UserService.getStoreInstance().setRow('users', id, user as unknown as Record<string, string | number>);
     return user;
   }
   
   // READ
   static getAllUsers(): User[] {
     const usersTable = UserService.getStoreInstance().getTable('users');
-    return Object.values(usersTable) as User[];
+    return Object.values(usersTable) as unknown as User[];
   }
   
   static getUserById(id: string): User | undefined {
     const user = UserService.getStoreInstance().getRow('users', id);
-    return user ? (user as User) : undefined;
+    return user && Object.keys(user).length > 0 ? (user as unknown as User) : undefined;
   }
   
   static getUserByEmail(email: string): User | undefined {
@@ -57,7 +59,7 @@ export class UserService {
       ...updates,
     };
     
-    UserService.getStoreInstance().setRow('users', id, updatedUser);
+    UserService.getStoreInstance().setRow('users', id, updatedUser as unknown as Record<string, string | number>);
     return updatedUser;
   }
   

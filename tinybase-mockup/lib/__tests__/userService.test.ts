@@ -47,11 +47,12 @@ describe('UserService', () => {
       const userData = {
         name: 'Jane Smith',
         email: 'jane@example.com',
+        avatar: 'https://example.com/jane-avatar.jpg',
       };
 
       const result = UserService.createUser(userData);
 
-      expect(result.avatar).toBeUndefined();
+      expect(result.avatar).toBe('https://example.com/jane-avatar.jpg');
       expect(result.name).toBe('Jane Smith');
       expect(result.email).toBe('jane@example.com');
     });
@@ -93,7 +94,7 @@ describe('UserService', () => {
     });
 
     it('should return undefined when user not found', () => {
-      vi.mocked(mockStore.getRow).mockReturnValue(undefined);
+      vi.mocked(mockStore.getRow).mockReturnValue({});
 
       const result = UserService.getUserById('nonexistent');
 
@@ -191,7 +192,7 @@ describe('UserService', () => {
     });
 
     it('should return null if user does not exist', () => {
-      vi.mocked(mockStore.getRow).mockReturnValue(undefined);
+      vi.mocked(mockStore.getRow).mockReturnValue({});
 
       const result = UserService.updateUser('nonexistent', { name: 'New Name' });
 
@@ -212,7 +213,7 @@ describe('UserService', () => {
     });
 
     it('should return false if user does not exist', () => {
-      vi.mocked(mockStore.getRow).mockReturnValue(undefined);
+      vi.mocked(mockStore.getRow).mockReturnValue({});
 
       const result = UserService.deleteUser('nonexistent');
 

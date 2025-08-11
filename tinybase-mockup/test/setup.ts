@@ -1,20 +1,19 @@
 import { beforeEach, vi } from 'vitest';
 
-// Mock AsyncStorage
-const mockAsyncStorage = {
-  getItem: vi.fn(() => Promise.resolve(null)),
-  setItem: vi.fn(() => Promise.resolve()),
-  removeItem: vi.fn(() => Promise.resolve()),
-  clear: vi.fn(() => Promise.resolve()),
-  getAllKeys: vi.fn(() => Promise.resolve([])),
-  multiGet: vi.fn(() => Promise.resolve([])),
-  multiSet: vi.fn(() => Promise.resolve()),
-  multiRemove: vi.fn(() => Promise.resolve()),
+// Mock SQLite since project uses expo-sqlite instead of AsyncStorage
+const mockSQLite = {
+  openDatabaseAsync: vi.fn(() => Promise.resolve({
+    execAsync: vi.fn(() => Promise.resolve()),
+    getAllAsync: vi.fn(() => Promise.resolve([])),
+    getFirstAsync: vi.fn(() => Promise.resolve(null)),
+    runAsync: vi.fn(() => Promise.resolve({ lastInsertRowId: 1, changes: 1 })),
+  })),
 };
 
-// Mock React Native modules
-vi.mock('@react-native-async-storage/async-storage', () => ({
-  default: mockAsyncStorage,
+vi.mock('expo-sqlite', () => ({
+  SQLiteProvider: ({ children }: any) => children,
+  useSQLiteContext: () => mockSQLite,
+  openDatabaseAsync: mockSQLite.openDatabaseAsync,
 }));
 
 vi.mock('react-native', () => ({
@@ -32,7 +31,7 @@ vi.mock('react-native', () => ({
     create: vi.fn((styles) => styles),
   },
   Text: 'Text',
-  View: 'View',
+  View: 'View', 
   ScrollView: 'ScrollView',
   TouchableOpacity: 'TouchableOpacity',
   TextInput: 'TextInput',

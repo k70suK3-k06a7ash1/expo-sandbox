@@ -1,0 +1,7 @@
+{
+  "plugins": [
+    "expo-sqlite"
+  ],
+  "name": "tinybase-template",
+  "slug": "tinybase-template"
+}
