@@ -10,13 +10,15 @@ export class TaskService {
     const now = Date.now();
     
     const task: Task = {
-      ...taskData,
       id,
+      title: taskData.title,
+      description: taskData.description,
+      completed: taskData.completed,
       createdAt: now,
       updatedAt: now,
     };
     
-    TaskService.getStoreInstance().setRow('tasks', id, task);
+    TaskService.getStoreInstance().setRow('tasks', id, task as Record<string, string | number | boolean>);
     return task;
   }
   
@@ -58,7 +60,7 @@ export class TaskService {
       updatedAt: Date.now(),
     };
     
-    TaskService.getStoreInstance().setRow('tasks', id, updatedTask);
+    TaskService.getStoreInstance().setRow('tasks', id, updatedTask as Record<string, string | number | boolean>);
     return updatedTask;
   }
   

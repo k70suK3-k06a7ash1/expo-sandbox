@@ -10,12 +10,14 @@ export class UserService {
     const now = Date.now();
     
     const user: User = {
-      ...userData,
       id,
+      name: userData.name,
+      email: userData.email,
+      avatar: userData.avatar,
       createdAt: now,
     };
     
-    UserService.getStoreInstance().setRow('users', id, user);
+    UserService.getStoreInstance().setRow('users', id, user as Record<string, string | number>);
     return user;
   }
   
@@ -57,7 +59,7 @@ export class UserService {
       ...updates,
     };
     
-    UserService.getStoreInstance().setRow('users', id, updatedUser);
+    UserService.getStoreInstance().setRow('users', id, updatedUser as Record<string, string | number>);
     return updatedUser;
   }
   
