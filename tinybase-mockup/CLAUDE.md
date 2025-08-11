@@ -11,6 +11,15 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - `npm run web` - Start web development server
 - `npm run lint` - Run ESLint to check code quality
 
+### Testing
+- `npm test` - Run tests in watch mode
+- `npm run test:run` - Run all tests once
+- `npm run test:ui` - Run tests with UI interface
+- `npm run test:coverage` - Run tests with coverage report
+
+### Code Quality
+- `npx tsc --noEmit` - Run TypeScript type checking
+
 ### Utilities
 - `npm run reset-project` - Reset project to initial state using custom script
 
@@ -69,4 +78,16 @@ Uses `@/*` path mapping (configured in `tsconfig.json`) for clean imports from p
 - TinyBase version 6.5.1 handles all state management
 - Expo SDK ~53 with new architecture enabled
 - TypeScript with strict mode enabled
-- No test framework currently configured
+- **Testing**: Vitest with jsdom environment, 80% coverage thresholds
+- **Git Hooks**: Lefthook runs lint, tests, and type-check on pre-commit
+- **Coverage**: Includes `lib/`, `hooks/`, `components/` directories
+
+## Task Completion Checklist
+
+When completing development tasks, ensure:
+1. `npx tsc --noEmit` passes (type checking)
+2. `npm run lint` passes (code style)
+3. `npm run test:run` passes (all tests)
+4. Consider running `npm run test:coverage` to check coverage
+
+Git hooks automatically run these checks on commit.
